@@ -19,7 +19,7 @@ public class RangeTest extends TestCase {
 	
 	private Range rangeObjectUnderTest;
 	private Range uninitialisedRange;
-
+	private double uninitialisedDouble;
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -186,7 +186,7 @@ public class RangeTest extends TestCase {
 				assertEquals("Should be invalid paramater exception", InvalidParameterException.class, ex.getClass());
 	}
 }
-	
+	@Test
 	public void testLowerGreaterThanUpperInRangeConstructor() {
 		try {
 		Range rangeToTest = new Range(15,2);
@@ -194,38 +194,100 @@ public class RangeTest extends TestCase {
 			assertEquals("Range (double, double) require lower <= upper", IllegalArgumentException.class, e.getClass());
 		}
 	}
-	
+	@Test
 	public void testGreaterThanMaxRangeValueInConstrainMethod() {
 		Range rangeToTest = new Range(4,12);
 		assertEquals("This should return the closest value, in this case 12.0", 12.0, rangeToTest.constrain(13));
 	}
-	
+	@Test
 	public void testLowerThanMinRangeValueInConstrainMethod() {
 		Range rangeToTest = new Range(28,95);
 		assertEquals("This should return the closest value, in this case 28.0", 28.0, rangeToTest.constrain(2));
 	}
-	
+	@Test
 	public void testRange1NullForCombineMethod() {
 		Range range1 = null;
 		Range range2 = new Range(20,30);
 		assertEquals("This should return range2", range2, Range.combine(range1, range2));
 	}
-	
+	@Test
 	public void testRange2NullForCombineMethod() {
 		Range range1 = new Range(12,45);
 		Range range2 = null;
 		assertEquals("This should return range1", range2, Range.combine(range1, range2));
 	}
-	
+	@Test
 	public void testValidPositiveRangesUsedInCombineMethod() {
 		Range range1 = new Range(30,45);
 		Range range2 = new Range(1,15);
 		Range expectedNewRange = new Range(1,45);
 		assertEquals("This should return a new range with values between 1 and 45", expectedNewRange, Range.combine(range1, range2));
 	}
-	
+	@Test
 	public void testShiftMethodInRange() {
 		Range expectedNewRange = new Range(4,14);
 		assertEquals("The new range should return values between 4 and 14", expectedNewRange, Range.shift(rangeObjectUnderTest, 4));
+	}
+	@Test
+	public void testShiftNoZeroCrossing() {
+		Range initialRange = new Range(4,10);
+		Range expectedRange = new Range(0, 2);
+		
+		assertEquals("When shifting a range of 4 - 10 -8 places right with a restriction of not crossing 0, expecting 0-2 as the new range", expectedRange, Range.shift(initialRange, -8, false));
+	}
+	@Test
+	public void testShiftMethodNegative() {
+		Range expectedNewRange = new Range(-4,6);
+		assertEquals("The new range should return values between -4 and 6", expectedNewRange, Range.shift(rangeObjectUnderTest, -4, true));
+	}
+	@Test
+	public void testExpandToIncludeLowerValid() {
+		Range expectedRange = new Range(-3, 10);
+		assertEquals("New range should be -3 - 10", expectedRange, Range.expandToInclude(rangeObjectUnderTest, -3));
+	}
+	@Test
+	public void testExpandToIncludeHigherValid() {
+		Range expectedRange = new Range(0, 15);
+		assertEquals("New range should be 0 - 15", expectedRange, Range.expandToInclude(rangeObjectUnderTest, 15));
+	}
+	@Test
+	public void testExpandToIncludeNullRange() {
+		Range expectedRange = new Range(15, 15);
+		assertEquals("New range should be 0 - 15", expectedRange, Range.expandToInclude(uninitialisedRange, 15));
+	}
+	@Test
+	public void testExpandToIncludeNullExpansionValue() {
+		Range expectedRange = new Range(0, 10);
+		assertEquals("New range should be 0 - 15", expectedRange, Range.expandToInclude(rangeObjectUnderTest, uninitialisedDouble));
+	}
+	@Test
+	public void testEqualityWithSameRange() {
+		Range newRange = new Range(0,10);
+		assertTrue("rangeObjectUnderTest and newRange should be equal", rangeObjectUnderTest.equals(newRange));
+	}
+	@Test
+	public void testEqualityWithDifferentLowerRange() {
+		Range newRange = new Range(-12,10);
+		assertFalse("rangeObjectUnderTest and newRange should be equal", rangeObjectUnderTest.equals(newRange));
+	}
+	@Test
+	public void testEqualityWithDifferentUpperRange() {
+		Range newRange = new Range(0,13);
+		assertFalse("rangeObjectUnderTest and newRange should not be equal", rangeObjectUnderTest.equals(newRange));
+	}
+	@Test
+	public void testEqualityWithDifferentRange() {
+		Range newRange = new Range(4,20);
+		assertFalse("rangeObjectUnderTest and newRange should not be equal", rangeObjectUnderTest.equals(newRange));
+	}
+	@Test
+	public void testEqualityWithDifferentObject() {
+		Object compare = new Object();
+		assertFalse("rangeObjectUnderTest and newRange should not be equal", rangeObjectUnderTest.equals(compare));
+	}
+	@Test
+	public void testToString() {
+		String expectedString = "Range[0,10]";
+		assertEquals("rangeObjectUnderTest.toString() should be Range[0,10]",expectedString, rangeObjectUnderTest.toString());
 	}
 }
