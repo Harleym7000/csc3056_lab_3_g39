@@ -186,4 +186,46 @@ public class RangeTest extends TestCase {
 				assertEquals("Should be invalid paramater exception", InvalidParameterException.class, ex.getClass());
 	}
 }
+	
+	public void testLowerGreaterThanUpperInRangeConstructor() {
+		try {
+		Range rangeToTest = new Range(15,2);
+		} catch (Exception e) {
+			assertEquals("Range (double, double) require lower <= upper", IllegalArgumentException.class, e.getClass());
+		}
+	}
+	
+	public void testGreaterThanMaxRangeValueInConstrainMethod() {
+		Range rangeToTest = new Range(4,12);
+		assertEquals("This should return the closest value, in this case 12.0", 12.0, rangeToTest.constrain(13));
+	}
+	
+	public void testLowerThanMinRangeValueInConstrainMethod() {
+		Range rangeToTest = new Range(28,95);
+		assertEquals("This should return the closest value, in this case 28.0", 28.0, rangeToTest.constrain(2));
+	}
+	
+	public void testRange1NullForCombineMethod() {
+		Range range1 = null;
+		Range range2 = new Range(20,30);
+		assertEquals("This should return range2", range2, Range.combine(range1, range2));
+	}
+	
+	public void testRange2NullForCombineMethod() {
+		Range range1 = new Range(12,45);
+		Range range2 = null;
+		assertEquals("This should return range1", range2, Range.combine(range1, range2));
+	}
+	
+	public void testValidPositiveRangesUsedInCombineMethod() {
+		Range range1 = new Range(30,45);
+		Range range2 = new Range(1,15);
+		Range expectedNewRange = new Range(1,45);
+		assertEquals("This should return a new range with values between 1 and 45", expectedNewRange, Range.combine(range1, range2));
+	}
+	
+	public void testShiftMethodInRange() {
+		Range expectedNewRange = new Range(4,14);
+		assertEquals("The new range should return values between 4 and 14", expectedNewRange, Range.shift(rangeObjectUnderTest, 4));
+	}
 }
