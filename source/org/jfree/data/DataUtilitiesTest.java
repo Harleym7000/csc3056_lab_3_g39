@@ -34,6 +34,8 @@ public class DataUtilitiesTest extends DataUtilities {
 	private double[][] doublesArray2D;
 	private DefaultKeyedValues positiveKeyedValuesData;
 	private DefaultKeyedValues negativeKeyedValuesData;
+	private DefaultKeyedValues nullWithinKeyedValuesData;
+	private DefaultKeyedValues2D nullWithinRowValue;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -120,6 +122,18 @@ public class DataUtilitiesTest extends DataUtilities {
 		negativeKeyedValuesData.addValue((Comparable) 0.0, -5.0);
 		negativeKeyedValuesData.addValue((Comparable) 1.0, -9.0);
 		negativeKeyedValuesData.addValue((Comparable) 2.0, -2.0);
+		
+		nullWithinKeyedValuesData = new DefaultKeyedValues();
+		nullWithinKeyedValuesData.addValue((Comparable) 0.0, null);
+		nullWithinKeyedValuesData.addValue((Comparable) 1.0, null);
+		nullWithinKeyedValuesData.addValue((Comparable) 2.0, 23.5);
+		nullWithinKeyedValuesData.addValue((Comparable) 3.0, 43.7);
+		
+		nullWithinRowValue = new DefaultKeyedValues2D();
+		nullWithinRowValue.addValue(null, 0, 0);
+		nullWithinRowValue.addValue(null, 1, 0);
+		nullWithinRowValue.addValue(3, 0, 1);
+		nullWithinRowValue.addValue(5, 1, 1);
 	}
 
 	@After
@@ -362,5 +376,22 @@ public class DataUtilitiesTest extends DataUtilities {
 		KeyedValues valuesToTest = DataUtilities.getCumulativePercentages((KeyedValues) negativeKeyedValuesData);
 		double valueToTest = (double) valuesToTest.getValue(2);
 		assertEquals("Expected output is 1", 1.0, valueToTest, 0.0000001d);
+	}
+	
+	@Test
+	public void testNullRowValueForCalculateRowTotal() {
+		values2D = nullWithinRowValue;
+		try {
+			DataUtilities.calculateRowTotal(nullWithinRowValue, 0);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testNullValueWithinGetCumulativePercentages() {
+		KeyedValues valuesToTest = DataUtilities.getCumulativePercentages((KeyedValues) nullWithinKeyedValuesData);
+		double valueToTest = (double) valuesToTest.getValue(1.0);
+		assertEquals("This should equal null", null, 0.0000001d);
 	}
 }
