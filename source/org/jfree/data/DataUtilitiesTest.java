@@ -392,6 +392,6 @@ public class DataUtilitiesTest extends DataUtilities {
 	public void testNullValueWithinGetCumulativePercentages() {
 		KeyedValues valuesToTest = DataUtilities.getCumulativePercentages((KeyedValues) nullWithinKeyedValuesData);
 		double valueToTest = (double) valuesToTest.getValue(1.0);
-		assertEquals("This should equal null", null, 0.0000001d);
+		assertEquals("This should return 0", 0.0, valueToTest, 0.0000001d);
 	}
 }
